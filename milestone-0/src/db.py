@@ -47,6 +47,7 @@ class DB:
             raise RuntimeError("DB connection has not been established. Call connect() first.")
         return self._conn
     
+    #execute sql scripts
     def execute_script(self, sql_text: str) -> None:
         conn = self._ensure_conn()
         statements = [s.strip() for s in sql_text.split(";") if s.strip()]
@@ -56,9 +57,6 @@ class DB:
     
     #list all students
     def list_students(self) -> List[Dict[str, Any]]:
-        """
-        Execute a SELECT query and return rows as list of dicts.
-        """
         conn = self._ensure_conn()
         with conn.cursor() as cur:
             cur.execute("SELECT * FROM Students")
@@ -78,6 +76,7 @@ class DB:
             print("PING ERROR:", repr(e))
             return False
 
+#initialize and return a db
 def get_db() -> DB:
     db = DB()
     db.connect()

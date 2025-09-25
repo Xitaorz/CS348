@@ -8,7 +8,6 @@ from .db import get_db, DB
 def create_app() -> Flask:
     app = Flask(__name__)
 
-    # Create a single DB handle for this process (sufficient for milestone 0)
     db: DB = get_db()
 
     @app.get("/health/db")

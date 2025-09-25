@@ -12,11 +12,8 @@ def _read_file(path: str) -> str:
 
 
 
-
+#Execute .sql files to initialize table contents
 def init_db() -> None:
-    """
-    Initialize schema and example data in the configured MySQL database.
-    """
     db: DB = get_db()
 
     schema_sql = _read_file("schema.sql")
@@ -27,11 +24,8 @@ def init_db() -> None:
 
     print("Database initialized and exampleed.")
 
-
+#Tests connection
 def ping() -> int:
-    """
-    CLI connectivity check; exit code 0 = success.
-    """
     db: DB = get_db()
     if db.ping():
         print("DB OK")
@@ -39,12 +33,8 @@ def ping() -> int:
     print("DB DOWN")
     return 1
 
-
+#list all rows in Students table
 def list_students() -> int:
-    """
-    CLI command: fetch all students and print them.
-    Exit code 0 = success, 1 = failure.
-    """
     try:
         db: DB = get_db()
         result = db.list_students()
@@ -60,7 +50,6 @@ def list_students() -> int:
         return 1
 
 def main(argv: List[str]) -> int:
-
     cmd = argv[1].lower()
     if cmd == "init":
         init_db()
