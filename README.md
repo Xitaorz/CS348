@@ -1,4 +1,7 @@
-# How to load and run the sample app
+# CS348
+The Project Repo for CS348
+
+## Milestone 0 - How to load and run the sample app
 
 Run commands from the project root: ...\CS348\milestone-0>
 
