@@ -1,0 +1,52 @@
+x-db-env: &db-env
+  DB_BACKEND: mysql
+  MYSQL_HOST: db
+  MYSQL_PORT: "3306"
+  MYSQL_USER: app_user
+  MYSQL_PASS: app_password
+  MYSQL_DB: app_db
+
+services:
+  app:
+    build: .
+    command: python -m src.app
+    ports:
+      - "3000:3000"
+    environment:
+      <<: *db-env
+    depends_on:
+      init-db:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  init-db:
+    build: .
+    command: python -m src.manage init
+    environment:
+      <<: *db-env
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: app_db
+      MYSQL_USER: app_user
+      MYSQL_PASSWORD: app_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  mysql_data:

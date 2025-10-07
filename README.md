@@ -3,7 +3,24 @@ The Project Repo for CS348
 
 ## Milestone 0 - How to load and run the sample app
 
-Run commands from the project root: ...\CS348\milestone-0>
+### Optional 1: Docker Compose
+
+After cloning the repo, run the following at the project root:
+```
+docker-compose up
+```
+
+Then open:
+
+http://localhost:3000/health/db
+ → {"db":"ok"}
+
+http://localhost:3000/students
+ → JSON array of rows
+
+### Option 2: Local Python Environment
+
+Run commands from the project root
 
 1) Create & activate a virtual environment
 ```bash
