@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import ast
 import sys
 from pathlib import Path
 from typing import List
 
 from .db import get_db, DB
 import kagglehub
-import os
+from kagglehub import KaggleDatasetAdapter
 
 DATASET_FILE_NAME = "tracks_features.csv"
 
@@ -29,11 +30,32 @@ def init_db() -> None:
     print("Database initialized and exampleed.")
 
 def import_data() -> None: 
-    path = kagglehub.dataset_download("rodolfofigueroa/spotify-12m-songs")
-    print(f"Data downloaded to {path}")
-    file = os.path.join(path, DATASET_FILE_NAME)
+    df = kagglehub.load_dataset(
+        KaggleDatasetAdapter.PANDAS,
+        "rodolfofigueroa/spotify-12m-songs",
+        "tracks_features.csv",
+        # Provide any additional arguments like 
+        # sql_query or pandas_kwargs. See the 
+        # documenation for more information:
+        # https://github.com/Kaggle/kagglehub/blob/main/README.md#kaggledatasetadapterpandas
+    )
     db: DB = get_db()
-    db.import_csv(file, "Songs", sample=True)
+
+    df = df.sample(n=200, random_state=1)
+    
+    songs_df = df["id", "name", "release_date"]
+    db.import_df(songs_df, "songs")
+    
+    df['artists'] = df['artists'].apply(lambda x: ast.literal_eval(x))
+    df['artist_ids'] = df['artist_ids'].apply(lambda x: ast.literal_eval(x))
+    artists_df = df.explode(["artists", "artist_ids"])[["artists", "artist_ids"]].drop_duplicates(subset=["artist_ids", "artists"])
+
+    print("Importing songs...")
+    db.import_df(df, "songs")
+    print("Importing artists...")
+    db.import_df(artists_df, "artists")
+    print("Data imported to DB.")
+
 
 def download_data() -> None:
     path = kagglehub.dataset_download("rodolfofigueroa/spotify-12m-songs")
