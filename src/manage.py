@@ -30,7 +30,7 @@ def init_db() -> None:
     print("Database initialized and exampleed.")
 
 def import_data() -> None: 
-    df = kagglehub.load_dataset(
+    df = kagglehub.dataset_load(
         KaggleDatasetAdapter.PANDAS,
         "rodolfofigueroa/spotify-12m-songs",
         "tracks_features.csv",
@@ -43,15 +43,14 @@ def import_data() -> None:
 
     df = df.sample(n=200, random_state=1)
     
-    songs_df = df["id", "name", "release_date"]
-    db.import_df(songs_df, "songs")
+    songs_df = df[["id", "name", "release_date"]]
     
     df['artists'] = df['artists'].apply(lambda x: ast.literal_eval(x))
     df['artist_ids'] = df['artist_ids'].apply(lambda x: ast.literal_eval(x))
     artists_df = df.explode(["artists", "artist_ids"])[["artists", "artist_ids"]].drop_duplicates(subset=["artist_ids", "artists"])
 
     print("Importing songs...")
-    db.import_df(df, "songs")
+    db.import_df(songs_df, "songs")
     print("Importing artists...")
     db.import_df(artists_df, "artists")
     print("Data imported to DB.")
