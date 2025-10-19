@@ -1,14 +1,15 @@
 from __future__ import annotations
-
-from dotenv import load_dotenv
-load_dotenv() 
+import pandas as pd
 
 import os
-from typing import Any, Iterable, List, Dict, Optional
+from typing import Any, List, Dict, Optional
 
 import pymysql
 from pymysql.cursors import DictCursor
+from sqlalchemy import create_engine
 
+from dotenv import load_dotenv
+load_dotenv() 
 
 print(
     "DB env ->",
@@ -24,12 +25,20 @@ class DB:
     def __init__(self) -> None:
         self._conn: Optional[pymysql.connections.Connection] = None
 
+    def import_csv(self, file_path: str, table_name: str, sample=False) -> int | None:
+        df = pd.read_csv(file_path)
+        if sample:
+            df = df.sample(n=200, random_state=1)
+        print(create_engine(self.connection_string))
+        print(df.to_sql(table_name, create_engine(self.connection_string), if_exists='replace', index=False))
+
     def connect(self) -> None:
         host = os.getenv("MYSQL_HOST", "127.0.0.1")
         port = int(os.getenv("MYSQL_PORT", "3306"))
         user = os.getenv("MYSQL_USER", "root")
         password = os.getenv("MYSQL_PASS", "")
         database = os.getenv("MYSQL_DB", "")
+        self.connection_string = f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}"
 
         # Establish connection
         self._conn = pymysql.connect(

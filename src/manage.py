@@ -5,6 +5,10 @@ from pathlib import Path
 from typing import List
 
 from .db import get_db, DB
+import kagglehub
+import os
+
+DATASET_FILE_NAME = "tracks_features.csv"
 
 
 def _read_file(path: str) -> str:
@@ -23,6 +27,17 @@ def init_db() -> None:
     db.execute_script(example_sql)
 
     print("Database initialized and exampleed.")
+
+def import_data() -> None: 
+    path = kagglehub.dataset_download("rodolfofigueroa/spotify-12m-songs")
+    print(f"Data downloaded to {path}")
+    file = os.path.join(path, DATASET_FILE_NAME)
+    db: DB = get_db()
+    db.import_csv(file, "Songs", sample=True)
+
+def download_data() -> None:
+    path = kagglehub.dataset_download("rodolfofigueroa/spotify-12m-songs")
+    print(f"Data downloaded to {path}")
 
 #Tests connection
 def ping() -> int:
@@ -58,6 +73,12 @@ def main(argv: List[str]) -> int:
         return ping()
     if cmd == "list":
         return list_students()
+    if cmd == "download":
+        download_data()
+        return 0
+    if cmd == "import":
+        import_data()
+        return 0
 
     print(f"Unknown command: {cmd}")
     return 2
