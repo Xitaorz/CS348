@@ -1,5 +1,140 @@
-CREATE TABLE IF NOT EXISTS Students (
-  id INT PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  age INT
+CREATE TABLE IF NOT EXISTS users (
+  uid           BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  username      VARCHAR(64)  NOT NULL,
+  email         VARCHAR(255) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+
+  -- profile (kept simple normalize further if needed)
+  gender    ENUM('male','female','nonbinary','other') NULL,
+  age       SMALLINT UNSIGNED NULL,
+  hobby     VARCHAR(255) NULL,
+  street    VARCHAR(255) NULL,
+  city      VARCHAR(128) NULL,
+  province  VARCHAR(128) NULL,
+  mbti      ENUM('INTJ','INTP','ENTJ','ENTP','INFJ','INFP','ENFJ','ENFP','ISTP','ISFP','ESTP','ESFP','ISTJ','ISFJ','ESTJ','ESFJ') NULL,
+
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- ISA: VIP is a specialization of users
+CREATE TABLE IF NOT EXISTS vip_users (
+  uid            BIGINT UNSIGNED PRIMARY KEY,
+  start_date     DATE NOT NULL,
+  end_date       DATE NULL,
+  special_effect VARCHAR(255) NULL,
+  CONSTRAINT fk_vip_user FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS artists (
+  artid      BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  name       VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Users follow artists
+CREATE TABLE IF NOT EXISTS user_follows_artist (
+  uid         BIGINT UNSIGNED NOT NULL,
+  artid       BIGINT UNSIGNED NOT NULL,
+  followed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (uid, artid),
+  CONSTRAINT fk_ufa_user   FOREIGN KEY (uid)   REFERENCES users(uid)     ON DELETE CASCADE,
+  CONSTRAINT fk_ufa_artist FOREIGN KEY (artid) REFERENCES artists(artid) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS albums (
+  alid         BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  title        VARCHAR(255) NOT NULL,
+  release_date DATE NULL
+);
+
+-- Album ownership (album is owned by one artist)
+CREATE TABLE IF NOT EXISTS album_owned_by_artist (
+  alid BIGINT UNSIGNED PRIMARY KEY,
+  artid BIGINT UNSIGNED NOT NULL,
+  CONSTRAINT fk_aoba_album  FOREIGN KEY (alid)  REFERENCES albums(alid)   ON DELETE CASCADE,
+  CONSTRAINT fk_aoba_artist FOREIGN KEY (artid) REFERENCES artists(artid) ON DELETE RESTRICT
+);
+
+CREATE TABLE IF NOT EXISTS songs (
+  sid           VARCHAR(20) NOT NULL PRIMARY KEY,
+  name          VARCHAR(255) NOT NULL,
+  released_date DATE NULL
+);
+
+-- Song in album (M:N keeps track/ordering)
+CREATE TABLE IF NOT EXISTS album_song (
+  alid     BIGINT UNSIGNED NOT NULL,
+  sid      VARCHAR(20) NOT NULL,
+  disc_no  SMALLINT UNSIGNED NULL,
+  track_no SMALLINT UNSIGNED NULL,
+  PRIMARY KEY (alid, sid),
+  INDEX idx_album_song_sid (sid),
+  CONSTRAINT fk_as_album FOREIGN KEY (alid) REFERENCES albums(alid) ON DELETE CASCADE,
+  CONSTRAINT fk_as_song  FOREIGN KEY (sid)  REFERENCES songs(sid)  ON DELETE CASCADE
+);
+
+-- Tags and song–tag mapping
+CREATE TABLE IF NOT EXISTS tags (
+  tid  BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS song_tag (
+  sid VARCHAR(20) NOT NULL,
+  tid BIGINT UNSIGNED NOT NULL,
+  PRIMARY KEY (sid, tid),
+  INDEX idx_song_tag_tag (tid),
+  CONSTRAINT fk_st_song FOREIGN KEY (sid) REFERENCES songs(sid) ON DELETE CASCADE,
+  CONSTRAINT fk_st_tag  FOREIGN KEY (tid) REFERENCES tags(tid) ON DELETE CASCADE
+);
+
+-- (Derived) view: tags for each album via its songs
+CREATE OR REPLACE VIEW album_tag_view AS
+SELECT DISTINCT asg.alid, st.tid
+FROM album_song AS asg
+JOIN song_tag  AS st ON st.sid = asg.sid;
+
+CREATE TABLE IF NOT EXISTS playlists (
+  plstid      BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  uid         BIGINT UNSIGNED NOT NULL,
+  name        VARCHAR(255) NOT NULL,
+  description TEXT NULL,
+  visibility  ENUM('public','private','unlisted') NOT NULL DEFAULT 'public',
+  created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_pl_owner FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE
+);
+
+-- Playlist contains songs (ordered)
+CREATE TABLE IF NOT EXISTS playlist_song (
+  plstid   BIGINT UNSIGNED NOT NULL,
+  sid      VARCHAR(20) NOT NULL,
+  position INT UNSIGNED NOT NULL, -- 1-based order in playlist
+  added_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (plstid, sid),
+  UNIQUE KEY uk_playlist_position (plstid, position),
+  CONSTRAINT fk_ps_playlist FOREIGN KEY (plstid) REFERENCES playlists(plstid) ON DELETE CASCADE,
+  CONSTRAINT fk_ps_song     FOREIGN KEY (sid)     REFERENCES songs(sid)     ON DELETE CASCADE
+);
+
+-- Users can favorite songs
+CREATE TABLE IF NOT EXISTS user_favorite_song (
+  uid       BIGINT UNSIGNED NOT NULL,
+  sid       VARCHAR(20) NOT NULL,
+  favored_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (uid, sid),
+  CONSTRAINT fk_ufs_user FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE,
+  CONSTRAINT fk_ufs_song FOREIGN KEY (sid) REFERENCES songs(sid) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS song_ratings (
+  rid        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  uid        BIGINT UNSIGNED NOT NULL,
+  sid        VARCHAR(20) NOT NULL,
+  rate_value TINYINT NOT NULL CHECK (rate_value BETWEEN 1 AND 5),
+  comment    TEXT NULL,
+  rated_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_user_song_rating (uid, sid), -- one rating per user per song
+  CONSTRAINT fk_sr_user FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE,
+  CONSTRAINT fk_sr_song FOREIGN KEY (sid) REFERENCES songs(sid) ON DELETE CASCADE
 );
