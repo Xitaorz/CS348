@@ -57,6 +57,7 @@ def import_data() -> None:
     albums_df = albums_df.rename(columns={"album_id": "alid", "album": "title"}).drop_duplicates(subset=["alid"])
     
     
+    
 
     print("Importing songs...")
     db.import_df(songs_df, "songs")
@@ -64,6 +65,17 @@ def import_data() -> None:
     db.import_df(artists_df, "artists")
     print("Importing albums...")
     db.import_df(albums_df, "albums")
+
+    print("Importing album_song...")
+    albums_songs_df = df[["album_id", "id", "disc_number", "track_number"]].drop_duplicates(subset=["album_id", "id"])
+    albums_songs_df = albums_songs_df.rename(columns={"album_id": "alid", "id": "sid", "disc_number": "disc_no", "track_number": "track_no"})
+    db.import_df(albums_songs_df, "album_song")
+
+    print("Importing album_owned_by_artist...")
+    album_owned_by_artist_df = df.explode(["artists", "artist_ids"])[["album_id", "artist_ids"]].drop_duplicates(subset=["album_id", "artist_ids"])
+    album_owned_by_artist_df = album_owned_by_artist_df.rename(columns={"album_id": "alid", "artist_ids": "artid"})
+    db.import_df(album_owned_by_artist_df, "album_owned_by_artist")
+
     print("Data imported to DB.")
 
 
