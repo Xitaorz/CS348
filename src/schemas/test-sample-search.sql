@@ -1,7 +1,12 @@
-SELECT s.title, a.artist_name, al.title AS album, s.duration, s.popularity
-FROM Songs s
-JOIN Albums al ON s.album_id = al.album_id
-JOIN Artists a ON al.artist_id = a.artist_id
-WHERE s.title ILIKE '%<search_string>%'
-   OR a.artist_name ILIKE '%<search_string>%'
-   OR al.title ILIKE '%<search_string>%';
+SELECT 
+    s.name AS song_name,
+    a.name AS artist_name,
+    al.title AS album_name
+FROM songs s
+JOIN album_song als ON s.sid = als.sid
+JOIN albums al ON als.alid = al.alid
+JOIN album_owned_by_artist aoa ON al.alid = aoa.alid
+JOIN artists a ON aoa.artid = a.artid
+WHERE LOWER(s.name) LIKE LOWER('%Debug Duo%')
+   OR LOWER(a.name) LIKE LOWER('%Debug Duo%')
+   OR LOWER(al.title) LIKE LOWER('%Debug Duo%');

@@ -3,8 +3,6 @@ CREATE TABLE IF NOT EXISTS users (
   username      VARCHAR(64)  NOT NULL,
   email         VARCHAR(255) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
-
-  -- profile (kept simple normalize further if needed)
   gender    ENUM('male','female','nonbinary','other') NULL,
   age       SMALLINT UNSIGNED NULL,
   hobby     VARCHAR(255) NULL,
