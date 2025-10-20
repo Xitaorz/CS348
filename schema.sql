@@ -3,8 +3,6 @@ CREATE TABLE IF NOT EXISTS users (
   username      VARCHAR(64)  NOT NULL,
   email         VARCHAR(255) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
-
-  -- profile (kept simple normalize further if needed)
   gender    ENUM('male','female','nonbinary','other') NULL,
   age       SMALLINT UNSIGNED NULL,
   hobby     VARCHAR(255) NULL,
@@ -16,8 +14,6 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
--- ISA: VIP is a specialization of users
 CREATE TABLE IF NOT EXISTS vip_users (
   uid            BIGINT UNSIGNED PRIMARY KEY,
   start_date     DATE NOT NULL,
@@ -27,15 +23,14 @@ CREATE TABLE IF NOT EXISTS vip_users (
 );
 
 CREATE TABLE IF NOT EXISTS artists (
-  artid      BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  name       VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  artid      VARCHAR(35) PRIMARY KEY,
+  name       VARCHAR(255) NOT NULL
 );
 
 -- Users follow artists
 CREATE TABLE IF NOT EXISTS user_follows_artist (
   uid         BIGINT UNSIGNED NOT NULL,
-  artid       BIGINT UNSIGNED NOT NULL,
+  artid       VARCHAR(35) NOT NULL,
   followed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (uid, artid),
   CONSTRAINT fk_ufa_user   FOREIGN KEY (uid)   REFERENCES users(uid)     ON DELETE CASCADE,
@@ -43,29 +38,29 @@ CREATE TABLE IF NOT EXISTS user_follows_artist (
 );
 
 CREATE TABLE IF NOT EXISTS albums (
-  alid         BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  alid         VARCHAR(35) PRIMARY KEY,
   title        VARCHAR(255) NOT NULL,
   release_date DATE NULL
 );
 
 -- Album ownership (album is owned by one artist)
 CREATE TABLE IF NOT EXISTS album_owned_by_artist (
-  alid BIGINT UNSIGNED PRIMARY KEY,
-  artid BIGINT UNSIGNED NOT NULL,
+  alid VARCHAR(35) NOT NULL,
+  artid VARCHAR(35) NOT NULL,
   CONSTRAINT fk_aoba_album  FOREIGN KEY (alid)  REFERENCES albums(alid)   ON DELETE CASCADE,
   CONSTRAINT fk_aoba_artist FOREIGN KEY (artid) REFERENCES artists(artid) ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS songs (
-  sid           VARCHAR(20) NOT NULL PRIMARY KEY,
+  sid           VARCHAR(35) NOT NULL PRIMARY KEY,
   name          VARCHAR(255) NOT NULL,
-  released_date DATE NULL
+  release_date DATE NULL
 );
 
 -- Song in album (M:N keeps track/ordering)
 CREATE TABLE IF NOT EXISTS album_song (
-  alid     BIGINT UNSIGNED NOT NULL,
-  sid      VARCHAR(20) NOT NULL,
+  alid     VARCHAR(35) NOT NULL,
+  sid      VARCHAR(35) NOT NULL,
   disc_no  SMALLINT UNSIGNED NULL,
   track_no SMALLINT UNSIGNED NULL,
   PRIMARY KEY (alid, sid),

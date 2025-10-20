@@ -31,10 +31,10 @@ class DB:
             df = df.sample(n=200, random_state=1)
         
         print(create_engine(self.connection_string))
-        print(df.to_sql(table_name, create_engine(self.connection_string), if_exists='replace', index=False))
+        print(df.to_sql(table_name, create_engine(self.connection_string), if_exists='append', index=False))
     
     def import_df(self, df: pd.DataFrame, table_name: str) -> int | None:
-        return df.to_sql(table_name, create_engine(self.connection_string), if_exists='replace', index=False)
+        return df.to_sql(table_name, create_engine(self.connection_string), if_exists='append', index=False)
 
     def connect(self) -> None:
         host = os.getenv("MYSQL_HOST", "127.0.0.1")

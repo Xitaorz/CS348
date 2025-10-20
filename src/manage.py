@@ -8,6 +8,7 @@ from typing import List
 from .db import get_db, DB
 import kagglehub
 from kagglehub import KaggleDatasetAdapter
+import pandas as pd
 
 DATASET_FILE_NAME = "tracks_features.csv"
 
@@ -24,9 +25,6 @@ def init_db() -> None:
     schema_sql = _read_file("schema.sql")
     db.execute_script(schema_sql)
 
-    example_sql = _read_file("example.sql")
-    db.execute_script(example_sql)
-
     print("Database initialized and exampleed.")
 
 def import_data() -> None: 
@@ -42,18 +40,30 @@ def import_data() -> None:
     db: DB = get_db()
 
     df = df.sample(n=200, random_state=1)
-    
+    print(df["release_date"].head())
+
+    df['release_date'] = pd.to_datetime(df['release_date'], format='%Y-%m-%d', errors="coerce")
     songs_df = df[["id", "name", "release_date"]]
+    songs_df.rename(columns={"id": "sid"}, inplace=True)
+
     
     df['artists'] = df['artists'].apply(lambda x: ast.literal_eval(x))
     df['artist_ids'] = df['artist_ids'].apply(lambda x: ast.literal_eval(x))
-    artists_df = df.explode(["artists", "artist_ids"])[["artists", "artist_ids"]].drop_duplicates(subset=["artist_ids", "artists"])
+    artists_df = df.explode(["artists", "artist_ids"])[["artists", "artist_ids"]].drop_duplicates(subset=["artist_ids"])
+    artists_df.rename(columns={"artist_ids": "artid", "artists": "name"}, inplace=True)
+    albums_df = df[["album_id", "album", "release_date"]].drop_duplicates(subset=["album_id"])
+    albums_df = albums_df.rename(columns={"album_id": "alid", "album": "title"}).drop_duplicates(subset=["alid"])
+    
+    
 
     print("Importing songs...")
     db.import_df(songs_df, "songs")
     print("Importing artists...")
     db.import_df(artists_df, "artists")
+    print("Importing albums...")
+    db.import_df(albums_df, "albums")
     print("Data imported to DB.")
+
 
 
 def download_data() -> None:
@@ -89,6 +99,7 @@ def main(argv: List[str]) -> int:
     cmd = argv[1].lower()
     if cmd == "init":
         init_db()
+        import_data()
         return 0
     if cmd == "ping":
         return ping()
@@ -96,9 +107,6 @@ def main(argv: List[str]) -> int:
         return list_students()
     if cmd == "download":
         download_data()
-        return 0
-    if cmd == "import":
-        import_data()
         return 0
 
     print(f"Unknown command: {cmd}")
