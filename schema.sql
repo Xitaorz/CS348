@@ -3,34 +3,45 @@ CREATE TABLE IF NOT EXISTS users (
   username      VARCHAR(64)  NOT NULL,
   email         VARCHAR(255) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
-
-  -- profile (kept simple normalize further if needed)
   gender    ENUM('male','female','nonbinary','other') NULL,
   age       SMALLINT UNSIGNED NULL,
-  hobby     VARCHAR(255) NULL,
   street    VARCHAR(255) NULL,
   city      VARCHAR(128) NULL,
   province  VARCHAR(128) NULL,
   mbti      ENUM('INTJ','INTP','ENTJ','ENTP','INFJ','INFP','ENFJ','ENFP','ISTP','ISFP','ESTP','ESFP','ISTJ','ISFJ','ESTJ','ESFJ') NULL,
-
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- ISA: VIP is a specialization of users
+
+
+CREATE TABLE IF NOT EXISTS user_hobbies (
+  uid   BIGINT UNSIGNED NOT NULL,
+  hobby VARCHAR(255) NOT NULL,
+  PRIMARY KEY (uid, hobby),
+  FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE
+);
+
+
+
 CREATE TABLE IF NOT EXISTS vip_users (
   uid            BIGINT UNSIGNED PRIMARY KEY,
   start_date     DATE NOT NULL,
   end_date       DATE NULL,
-  special_effect VARCHAR(255) NULL,
+  special_effect BOOLEAN DEFAULT FALSE,
   CONSTRAINT fk_vip_user FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE
 );
+
+
+
 
 CREATE TABLE IF NOT EXISTS artists (
   artid      BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   name       VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+
+
 
 -- Users follow artists
 CREATE TABLE IF NOT EXISTS user_follows_artist (
@@ -89,7 +100,7 @@ CREATE TABLE IF NOT EXISTS song_tag (
   CONSTRAINT fk_st_tag  FOREIGN KEY (tid) REFERENCES tags(tid) ON DELETE CASCADE
 );
 
--- (Derived) view: tags for each album via its songs
+-- view: tags for each album via its songs
 CREATE OR REPLACE VIEW album_tag_view AS
 SELECT DISTINCT asg.alid, st.tid
 FROM album_song AS asg
