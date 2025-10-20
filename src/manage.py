@@ -53,6 +53,7 @@ def import_data() -> None:
     df['artist_ids'] = df['artist_ids'].apply(lambda x: ast.literal_eval(x))
     artists_df = df.explode(["artists", "artist_ids"])[["artists", "artist_ids"]].drop_duplicates(subset=["artist_ids"])
     artists_df.rename(columns={"artist_ids": "artid", "artists": "name"}, inplace=True)
+    artists_df = artists_df[["artid", "name"]]
     albums_df = df[["album_id", "album", "release_date"]].drop_duplicates(subset=["album_id"])
     albums_df = albums_df.rename(columns={"album_id": "alid", "album": "title"}).drop_duplicates(subset=["alid"])
     
