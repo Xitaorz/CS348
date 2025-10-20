@@ -139,6 +139,14 @@ CREATE TABLE IF NOT EXISTS user_rates(
   CONSTRAINT fk_sr_user FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE,
   CONSTRAINT fk_sr_song FOREIGN KEY (sid) REFERENCES songs(sid) ON DELETE CASCADE,
   CONSTRAINT fk_sr_rating FOREIGN KEY (rid) REFERENCES ratings(rid) ON DELETE CASCADE
-)
+);
 
-
+-- Users can follow playlists
+CREATE TABLE IF NOT EXISTS user_follow_playlist (
+  uid       BIGINT UNSIGNED NOT NULL,
+  plstid    BIGINT UNSIGNED NOT NULL,
+  followed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (uid, plstid),
+  CONSTRAINT fk_ufp_user FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE,
+  CONSTRAINT fk_ufp_playlist FOREIGN KEY (plstid) REFERENCES playlists(plstid) ON DELETE CASCADE
+);
