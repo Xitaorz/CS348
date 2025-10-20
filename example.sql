@@ -105,11 +105,19 @@ VALUES
 ON DUPLICATE KEY UPDATE
   favored_at = VALUES(favored_at);
 
-INSERT INTO song_ratings (rid, uid, sid, rate_value, comment, rated_at)
+INSERT INTO ratings (rid, rate_value, comment)
 VALUES
-  (1, 1, 'SNG001', 5, 'Perfect for focus.', '2024-04-01 09:15:00'),
-  (2, 2, 'SNG002', 4, 'Gets me moving.', '2024-04-02 10:15:00')
+  (1, 5, 'Perfect for focus.'),
+  (2, 4, 'Gets me moving.')
 ON DUPLICATE KEY UPDATE
   rate_value = VALUES(rate_value),
-  comment = VALUES(comment),
+  comment = VALUES(comment);
+
+INSERT INTO user_rates (rid, uid, sid, rated_at)
+VALUES
+  (1, 1, 'SNG001', '2024-04-01 09:15:00'),
+  (2, 2, 'SNG002', '2024-04-02 10:15:00')
+ON DUPLICATE KEY UPDATE
+  uid = VALUES(uid),
+  sid = VALUES(sid),
   rated_at = VALUES(rated_at);
