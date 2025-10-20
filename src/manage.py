@@ -41,7 +41,7 @@ def import_data() -> None:
     )
     db: DB = get_db()
 
-    df = df.sample(n=200, random_state=1)
+    df = df.sample(n=5000, random_state=1)
     print(df["release_date"].head())
 
     df['release_date'] = pd.to_datetime(df['release_date'], format='%Y-%m-%d', errors="coerce")

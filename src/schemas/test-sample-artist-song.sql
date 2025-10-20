@@ -12,4 +12,4 @@ JOIN album_song AS als
   ON a.alid = als.alid            
 JOIN songs AS s
   ON als.sid = s.sid              
-WHERE ar.artid = 1              
+WHERE ar.artid = "00gh6kmKYOu8xyorRxQm6a"

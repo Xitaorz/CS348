@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS artists (
 -- Users follow artists
 CREATE TABLE IF NOT EXISTS user_follows_artist (
   uid         BIGINT UNSIGNED NOT NULL,
-  artid       BIGINT UNSIGNED NOT NULL,
+  artid       VARCHAR(35) NOT NULL,
   followed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (uid, artid),
   CONSTRAINT fk_ufa_user   FOREIGN KEY (uid)   REFERENCES users(uid)     ON DELETE CASCADE,
@@ -54,30 +54,31 @@ CREATE TABLE IF NOT EXISTS user_follows_artist (
 );
 
 CREATE TABLE IF NOT EXISTS albums (
-  alid         BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  alid         VARCHAR(35) PRIMARY KEY,
   title        VARCHAR(255) NOT NULL,
   release_date DATE NULL
 );
 
 -- Album ownership (album is owned by one artist)
 CREATE TABLE IF NOT EXISTS album_owned_by_artist (
-  alid BIGINT UNSIGNED PRIMARY KEY,
-  artid BIGINT UNSIGNED NOT NULL,
+  alid VARCHAR(35) NOT NULL,
+  artid VARCHAR(35) NOT NULL,
+  PRIMARY KEY (alid, artid),
   CONSTRAINT fk_aoba_album  FOREIGN KEY (alid)  REFERENCES albums(alid)   ON DELETE CASCADE,
   CONSTRAINT fk_aoba_artist FOREIGN KEY (artid) REFERENCES artists(artid) ON DELETE RESTRICT
 );
 ;
 
 CREATE TABLE IF NOT EXISTS songs (
-  sid           VARCHAR(20) NOT NULL PRIMARY KEY,
-  name          VARCHAR(255) NOT NULL,
+  sid           VARCHAR(35) NOT NULL PRIMARY KEY,
+  name          TEXT NOT NULL,
   release_date DATE NULL
 );
 
 -- Song in album (M:N keeps track/ordering)
 CREATE TABLE IF NOT EXISTS album_song (
-  alid     BIGINT UNSIGNED NOT NULL,
-  sid      VARCHAR(20) NOT NULL,
+  alid     VARCHAR(35) NOT NULL,
+  sid      VARCHAR(35) NOT NULL,
   disc_no  SMALLINT UNSIGNED NULL,
   track_no SMALLINT UNSIGNED NULL,
   PRIMARY KEY (alid, sid),
@@ -93,7 +94,7 @@ CREATE TABLE IF NOT EXISTS tags (
 );
 
 CREATE TABLE IF NOT EXISTS song_tag (
-  sid VARCHAR(20) NOT NULL,
+  sid VARCHAR(35) NOT NULL,
   tid BIGINT UNSIGNED NOT NULL,
   PRIMARY KEY (sid, tid),
   INDEX idx_song_tag_tag (tid),
@@ -120,7 +121,7 @@ CREATE TABLE IF NOT EXISTS playlists (
 -- Playlist contains songs (ordered)
 CREATE TABLE IF NOT EXISTS playlist_song (
   plstid   BIGINT UNSIGNED NOT NULL,
-  sid      VARCHAR(20) NOT NULL,
+  sid      VARCHAR(35) NOT NULL,
   position INT UNSIGNED NOT NULL, -- 1-based order in playlist
   added_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (plstid, sid),
@@ -132,7 +133,7 @@ CREATE TABLE IF NOT EXISTS playlist_song (
 -- Users can favorite songs
 CREATE TABLE IF NOT EXISTS user_favorite_song (
   uid       BIGINT UNSIGNED NOT NULL,
-  sid       VARCHAR(20) NOT NULL,
+  sid       VARCHAR(35) NOT NULL,
   favored_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (uid, sid),
   CONSTRAINT fk_ufs_user FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE,
@@ -149,7 +150,7 @@ CREATE TABLE IF NOT EXISTS ratings (
 CREATE TABLE IF NOT EXISTS user_rates(
   rid        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   uid        BIGINT UNSIGNED NOT NULL,
-  sid        VARCHAR(20) NOT NULL,
+  sid        VARCHAR(35) NOT NULL,
   rated_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   -- one rating per user per song
   UNIQUE KEY uk_user_song_rating (uid, sid, rid),
