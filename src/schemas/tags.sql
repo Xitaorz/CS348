@@ -1,5 +1,5 @@
 -- Create permanent table
-CREATE TABLE phys_song_tag (
+CREATE TABLE IF NOT EXISTS phys_song_tag (
   `sid`      VARCHAR(64)  NOT NULL,
   tag        VARCHAR(32)  NOT NULL,
   PRIMARY KEY (`sid`, tag),
