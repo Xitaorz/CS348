@@ -11,7 +11,7 @@ ON DUPLICATE KEY UPDATE
 
 INSERT INTO vip_users (uid, start_date, end_date, special_effect)
 VALUES
-  (1, '2024-01-01', NULL, 'Sparkles')
+  (1, '2024-01-01', NULL, TRUE)
 ON DUPLICATE KEY UPDATE
   start_date = VALUES(start_date),
   end_date = VALUES(end_date),

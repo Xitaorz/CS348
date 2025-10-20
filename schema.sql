@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS album_owned_by_artist (
 CREATE TABLE IF NOT EXISTS songs (
   sid           VARCHAR(20) NOT NULL PRIMARY KEY,
   name          VARCHAR(255) NOT NULL,
-  released_date DATE NULL
+  release_date DATE NULL
 );
 
 -- Song in album (M:N keeps track/ordering)
