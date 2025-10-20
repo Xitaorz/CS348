@@ -98,6 +98,13 @@ ON DUPLICATE KEY UPDATE
   position = VALUES(position),
   added_at = VALUES(added_at);
 
+INSERT INTO user_follow_playlist (uid, plstid, followed_at)
+VALUES
+  (1, 2, '2024-04-03 08:00:00'),
+  (2, 1, '2024-04-04 11:30:00')
+ON DUPLICATE KEY UPDATE
+  followed_at = VALUES(followed_at);
+
 INSERT INTO user_favorite_song (uid, sid, favored_at)
 VALUES
   (1, 'SNG001', '2024-04-01 09:10:00'),

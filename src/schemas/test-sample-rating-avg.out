@@ -1,2 +1,4 @@
-1	1	SNG001	5	Perfect for focus.	2024-04-01 09:15:00
-2	2	SNG002	4	Gets me moving.	2024-04-02 10:15:00
+song_name	artist_name	avg_rating	rating_count
+Compile My Heart	The Coders	3.50	2
+Late Night Deploy	Debug Duo	3.00	1
+Infinite Loop	Debug Duo	4.50	2
