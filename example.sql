@@ -46,14 +46,14 @@ VALUES
 ON DUPLICATE KEY UPDATE
   artid = VALUES(artid);
 
-INSERT INTO songs (sid, name, released_date)
+INSERT INTO songs (sid, name, release_date)
 VALUES
   ('SNG001', 'Compile My Heart', '2023-11-01'),
   ('SNG002', 'Infinite Loop', '2024-03-15'),
   ('SNG003', 'Late Night Deploy', NULL)
 ON DUPLICATE KEY UPDATE
   name = VALUES(name),
-  released_date = VALUES(released_date);
+  release_date = VALUES(release_date);
 
 INSERT INTO album_song (alid, sid, disc_no, track_no)
 VALUES
@@ -105,11 +105,25 @@ VALUES
 ON DUPLICATE KEY UPDATE
   favored_at = VALUES(favored_at);
 
-INSERT INTO song_ratings (rid, uid, sid, rate_value, comment, rated_at)
+INSERT INTO ratings (rid, rate_value, comment)
 VALUES
-  (1, 1, 'SNG001', 5, 'Perfect for focus.', '2024-04-01 09:15:00'),
-  (2, 2, 'SNG002', 4, 'Gets me moving.', '2024-04-02 10:15:00')
+  (1, 5, 'Perfect for focus.'),
+  (2, 4, 'Gets me moving.'),
+  (3, 3, 'Decent background track.'),
+  (4, 5, 'On repeat lately.'),
+  (5, 2, 'Too slow for my taste.')
 ON DUPLICATE KEY UPDATE
   rate_value = VALUES(rate_value),
-  comment = VALUES(comment),
+  comment = VALUES(comment);
+
+INSERT INTO user_rates (rid, uid, sid, rated_at)
+VALUES
+  (1, 1, 'SNG001', '2024-04-01 09:15:00'),
+  (2, 2, 'SNG002', '2024-04-02 10:15:00'),
+  (3, 2, 'SNG003', '2024-04-02 10:20:00'),
+  (4, 1, 'SNG002', '2024-04-03 14:00:00'),
+  (5, 2, 'SNG001', '2024-04-04 09:30:00')
+ON DUPLICATE KEY UPDATE
+  uid = VALUES(uid),
+  sid = VALUES(sid),
   rated_at = VALUES(rated_at);

@@ -122,14 +122,23 @@ CREATE TABLE IF NOT EXISTS user_favorite_song (
   CONSTRAINT fk_ufs_song FOREIGN KEY (sid) REFERENCES songs(sid) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS song_ratings (
+CREATE TABLE IF NOT EXISTS ratings (
+  rid        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  rate_value TINYINT NOT NULL CHECK (rate_value BETWEEN 1 AND 5),
+  comment    TEXT NULL
+  
+);
+
+CREATE TABLE IF NOT EXISTS user_rates(
   rid        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   uid        BIGINT UNSIGNED NOT NULL,
   sid        VARCHAR(20) NOT NULL,
-  rate_value TINYINT NOT NULL CHECK (rate_value BETWEEN 1 AND 5),
-  comment    TEXT NULL,
   rated_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE KEY uk_user_song_rating (uid, sid), -- one rating per user per song
+  -- one rating per user per song
+  UNIQUE KEY uk_user_song_rating (uid, sid, rid),
   CONSTRAINT fk_sr_user FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE,
-  CONSTRAINT fk_sr_song FOREIGN KEY (sid) REFERENCES songs(sid) ON DELETE CASCADE
-);
+  CONSTRAINT fk_sr_song FOREIGN KEY (sid) REFERENCES songs(sid) ON DELETE CASCADE,
+  CONSTRAINT fk_sr_rating FOREIGN KEY (rid) REFERENCES ratings(rid) ON DELETE CASCADE
+)
+
+
