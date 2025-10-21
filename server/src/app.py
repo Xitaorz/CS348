@@ -4,11 +4,14 @@ import os
 import time
 from flask import Flask, jsonify, request
 from .db import get_db, DB
-from .manage import init_db, import_data
+from .manage import init_db
+from flask_cors import CORS  
+
 
 
 def create_app() -> Flask:
     app = Flask(__name__)
+    CORS(app)
 
     max_retries = 30
     retry_delay = 1

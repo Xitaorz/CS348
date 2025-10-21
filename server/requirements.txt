@@ -5,3 +5,4 @@ cryptography>=42.0.0
 kagglehub
 pandas
 sqlalchemy
+flask_cors
