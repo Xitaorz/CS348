@@ -1,0 +1,3 @@
+uid username num_playlists num_favorites vip_status
+1	alice	1	1	VIP
+2	bob	1	1	Regular
