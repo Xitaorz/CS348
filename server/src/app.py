@@ -60,11 +60,6 @@ def create_app() -> Flask:
     
     @app.get("/search")
     def search():
-        """
-        Search for songs, artists, and albums.
-        Query parameter: q (search query)
-        Example: /search?q=debug
-        """
         try:
             query = request.args.get('q', '')
             if not query:
@@ -81,7 +76,6 @@ def create_app() -> Flask:
     
     @app.get("/tables")
     def show_tables():
-        """Show all tables in the database."""
         try:
             tables = db.show_tables()
             return jsonify({
@@ -93,11 +87,6 @@ def create_app() -> Flask:
     
     @app.get("/ratings/average")
     def rating_averages():
-        """
-        Get average ratings for all songs.
-        Shows song name, artist, average rating, and number of ratings.
-        Implements query from test-sample-rating-avg.sql
-        """
         try:
             ratings = db.get_rating_averages()
             return jsonify({
