@@ -23,9 +23,9 @@ def init_db() -> None:
     db: DB = get_db()
 
     schema_sql = _read_file("schema.sql")
-    example_sql = _read_file("example.sql")
+    sample_sql = _read_file("test-sample.sql")
     db.execute_script(schema_sql)
-    db.execute_script(example_sql)
+    db.execute_script(sample_sql)
 
     print("Database initialized and exampleed.")
 
