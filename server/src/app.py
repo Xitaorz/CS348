@@ -4,7 +4,7 @@ import os
 import time
 from flask import Flask, jsonify, request
 from .db import get_db, DB
-from .manage import init_db
+from .manage import init_db, import_data
 
 
 def create_app() -> Flask:
@@ -36,6 +36,8 @@ def create_app() -> Flask:
             if not cur.fetchone():
                 init_db()
                 print("Database initialization complete.")
+                import_data()
+                print("Data imported.")
     except Exception as e:
         print(f"Error: {e}")
 
