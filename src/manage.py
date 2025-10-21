@@ -94,11 +94,11 @@ def ping() -> int:
     print("DB DOWN")
     return 1
 
-#list all rows in Students table
-def list_students() -> int:
+#list all rows in users table
+def list_users() -> int:
     try:
         db: DB = get_db()
-        result = db.list_students()
+        result = db.list_users()
         if result:
             for row in result:
                 print(row)
@@ -119,7 +119,7 @@ def main(argv: List[str]) -> int:
     if cmd == "ping":
         return ping()
     if cmd == "list":
-        return list_students()
+        return list_users()
     if cmd == "download":
         download_data()
         return 0

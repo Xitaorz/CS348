@@ -68,11 +68,67 @@ class DB:
             for stmt in statements:
                 cur.execute(stmt)
     
-    #list all students
-    def list_students(self) -> List[Dict[str, Any]]:
+    #list all users
+    def list_users(self) -> List[Dict[str, Any]]:
         conn = self._ensure_conn()
         with conn.cursor() as cur:
-            cur.execute("SELECT * FROM Students")
+            cur.execute("SELECT uid, username, email, gender, age, city, province, mbti, created_at FROM users")
+            rows = cur.fetchall()
+        return list(rows)
+    
+    # Search for songs, artists, and albums
+    def search(self, query: str) -> List[Dict[str, Any]]:
+        conn = self._ensure_conn()
+        search_pattern = f"%{query}%"
+        with conn.cursor() as cur:
+            sql = """
+                SELECT 
+                    s.name AS song_name,
+                    a.name AS artist_name,
+                    al.title AS album_name,
+                    al.release_date
+                FROM songs s
+                JOIN album_song als ON s.sid = als.sid
+                JOIN albums al ON als.alid = al.alid
+                JOIN album_owned_by_artist aoa ON al.alid = aoa.alid
+                JOIN artists a ON aoa.artid = a.artid
+                WHERE LOWER(s.name) LIKE LOWER(%s)
+                   OR LOWER(a.name) LIKE LOWER(%s)
+                   OR LOWER(al.title) LIKE LOWER(%s)
+                ORDER BY s.name
+            """
+            cur.execute(sql, (search_pattern, search_pattern, search_pattern))
+            rows = cur.fetchall()
+        return list(rows)
+    
+    # Show all tables in the database
+    def show_tables(self) -> List[Dict[str, Any]]:
+        conn = self._ensure_conn()
+        with conn.cursor() as cur:
+            cur.execute("SHOW TABLES")
+            rows = cur.fetchall()
+        return list(rows)
+    
+    # Get average ratings for all songs
+    def get_rating_averages(self) -> List[Dict[str, Any]]:
+        conn = self._ensure_conn()
+        with conn.cursor() as cur:
+            sql = """
+                SELECT
+                    s.name AS song_name,
+                    a.name AS artist_name,
+                    ROUND(AVG(rt.rate_value), 2) AS avg_rating,
+                    COUNT(rt.rid) AS rating_count
+                FROM user_rates ur
+                JOIN ratings rt ON ur.rid = rt.rid
+                JOIN songs s ON ur.sid = s.sid
+                JOIN album_song als ON s.sid = als.sid
+                JOIN album_owned_by_artist aoa ON als.alid = aoa.alid
+                JOIN artists a ON aoa.artid = a.artid
+                GROUP BY s.sid, a.artid, s.name, a.name
+                ORDER BY avg_rating DESC, rating_count DESC
+            """
+            cur.execute(sql)
             rows = cur.fetchall()
         return list(rows)
 

@@ -15,19 +15,9 @@ services:
     environment:
       <<: *db-env
     depends_on:
-      init-db:
-        condition: service_completed_successfully
-    restart: unless-stopped
-
-  init-db:
-    build: .
-    command: python -m src.manage init
-    environment:
-      <<: *db-env
-    depends_on:
       db:
         condition: service_healthy
-    restart: "no"
+    restart: unless-stopped
 
   db:
     image: mysql:8.0

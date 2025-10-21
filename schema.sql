@@ -67,7 +67,6 @@ CREATE TABLE IF NOT EXISTS album_owned_by_artist (
   CONSTRAINT fk_aoba_album  FOREIGN KEY (alid)  REFERENCES albums(alid)   ON DELETE CASCADE,
   CONSTRAINT fk_aoba_artist FOREIGN KEY (artid) REFERENCES artists(artid) ON DELETE RESTRICT
 );
-;
 
 CREATE TABLE IF NOT EXISTS songs (
   sid           VARCHAR(35) NOT NULL PRIMARY KEY,
