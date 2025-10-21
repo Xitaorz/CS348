@@ -4,7 +4,7 @@ import os
 import time
 from flask import Flask, jsonify, request
 from .db import get_db, DB
-from .manage import init_db
+from .manage import import_data, init_db
 from flask_cors import CORS  
 
 
