@@ -12,4 +12,6 @@ JOIN album_song AS als
   ON a.alid = als.alid            
 JOIN songs AS s
   ON als.sid = s.sid              
-WHERE ar.artid = "00gh6kmKYOu8xyorRxQm6a"
+WHERE ar.artid = "1" OR ar.artid = "2"
+ORDER BY als.track_no ASC
+LIMIT 50;
