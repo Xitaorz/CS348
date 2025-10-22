@@ -20,14 +20,14 @@ def create_app() -> Flask:
     for attempt in range(max_retries):
         try:
             db = get_db()
-            print(f"Database connected successfully!")
+            print(f"Database connected XD!")
             break
         except Exception as e:
             if attempt < max_retries - 1:
-                print(f"Database connection attempt {attempt + 1}/{max_retries} failed. Retrying in {retry_delay}s...")
+                print(f"Database connection attempt {attempt + 1}/{max_retries} failed...")
                 time.sleep(retry_delay)
             else:
-                print(f"Failed to connect to database after {max_retries} attempts: {e}")
+                print(f"Failed to connect to database: {e}")
                 raise
     
     if db is None:
@@ -40,7 +40,7 @@ def create_app() -> Flask:
                 init_db()
                 print("Database initialization complete.")
                 import_data()
-                print("Data imported.")
+                print("Data imported!")
     except Exception as e:
         print(f"Error: {e}")
 
@@ -63,7 +63,7 @@ def create_app() -> Flask:
         try:
             query = request.args.get('q', '')
             if not query:
-                return jsonify({"error": "Missing 'q' query parameter"}), 400
+                return jsonify({"error": "missing query parameter"}), 400
             
             results = db.search(query)
             return jsonify({

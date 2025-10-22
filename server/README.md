@@ -1,9 +1,9 @@
 # CS348
 The Project Repo for CS348
 
-## Quick Start
+> For assignment requirements, please see [`milestone.md`](./milestone.md)
 
-The application **automatically initializes** the database schema and example data on first startup - no manual setup required!
+## Quick Start
 
 ---
 
@@ -98,7 +98,7 @@ On first startup, the app will automatically:
 ```bash
 python -m src.manage init
 ```
-⚠️ This takes several minutes and requires Kaggle credentials
+This takes several minutes and requires Kaggle credentials
 
 ### Test database connectivity
 ```bash
@@ -107,10 +107,7 @@ python -m src.manage ping
 
 ### Stop and remove Docker containers
 ```bash
-# For docker-compose setup
 docker-compose down
-
-# For local MySQL setup
 docker stop m0-mysql
 docker rm m0-mysql
 ```
