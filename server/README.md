@@ -195,7 +195,7 @@ Implements query from `test-sample-rating-avg.sql`
   ]
 }
 ```
-###Features description:
+#### Features description:
 
 Feature 1 
 
